@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+ 
+<script
+    src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+<link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
+<style type="text/css">
+#listall {
+    position: absolute;
+    top: 75px;
+    left: 25px;
+}
+ 
+#add {
+    position: absolute;
+    top: 75px;
+    right: 15px;
+}
+ 
+
+div#list table tr td{
+    padding: 10px;
+    margin: 5px;
+}
+</style>
+ 
+<title>Ticket CRUD Page</title>
+</head>
+<body>
+    <h2 align="center">Ticket CRUD Page</h2>
+    <div id="listall">
+        <table id="list" border="0">
+            <thead>
+                <tr>
+                    <td>TicketId</td>
+                    <td>customerId</td>
+                    <td>Departure</td>
+                    <td>From</td>
+                    <td>To</td>
+                    <td>Numberof passengers</td>
+                    <td>insurance</td>
+                    <td>refundable</td>
+                    <td>bookingdate</td>
+                    <td>Totalamount</td>
+                    
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+ 
+    <div id="add">
+        <table border="0">
+            <tr>
+                <td>TicketId</td>
+                <td><input type="text" id="id" /></td>
+            </tr>
+            <tr>
+                <td>customerId</td>
+                <td><input type="text" id="custid" /></td>
+            </tr>
+            <tr>
+                <td>Departure</td>
+                <td><input type="text" id="depat" /></td>
+            </tr>
+            <tr>
+                <td>From</td>
+                <td><input type="text" id="From" /></td>
+            </tr>
+            <tr>
+                <td>To</td>
+                <td><input type="text" id="To" /></td>
+            </tr>
+            <tr>
+                <td>Numberof passengers</td>
+                <td><input type="text" id="passengers" /></td>
+            </tr>
+            <tr>
+                <td>insurance</td>
+                <td><input type="text" id="insurance" /></td>
+            </tr>
+            <tr>
+                <td>refundable</td>
+                <td><input type="text" id="refund" /></td>
+            </tr>
+            <tr>
+                <td>Bookingdate</td>
+                <td><input type="text" id="date" /></td>
+            </tr>
+             <tr>
+                <td>Totalamount</td>
+                <td><input type="text" id="amount" /></td>
+            </tr>
+            <tr>
+                <td colspan="2"></td>
+            </tr>
+            <tr>
+                <td align="center" colspan="2"> <button id="update">Update</button> 
+                <button id="submit">Submit</button></td>
+            </tr>
+        </table>
+        <br />
+        <div>
+            <p id="msg"></p>
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(document).ready(
+                function() {
+                    var path = "http://localhost:4444/ticket";
+                    $("#submit").show();
+                    $("#update").hide();
+ 
+                    $.ajax({
+                        type : 'GET',
+                        url : path + "/list"
+                    }).then(
+                            function(json) {
+                                var arr = [];
+                                var str = "";
+                                for (var i = 0; i < json.length; i++) {
+                                    arr.push('<tr>');
+                                    arr.push('<td>' + json[i].id + '</td>'
+                                            + '<td>' + json[i].custid + '</td>'
+                                           + '<td>' + json[i].depat + '</td>'
+                                           + '<td>' + json[i].From + '</td>'
+                                           + '<td>' + json[i].To + '</td>'
+                                           + '<td>' + json[i].passengers + '</td>'
+                                           + '<td>' + json[i].insurance + '</td>'
+                                           + '<td>' + json[i].refund + '</td>' 
+                                           + '<td>' + json[i].date + '</td>'
+                                           + '<td>' + json[i].amount + '</td>');
+                                    arr.push('<td> <button id=\'edit\' onClick=\'alert(this.value);\' value=\''+json[i].id +'\'>Update</button></td>');
+                                    arr.push('<td> <button id=\'delete\' onClick=\'alert(this.value);\' value=\''+json[i].id +'\'>Delete</button></td>');
+                                    arr.push('</tr>');
+                                }
+                                $('#list').append($(arr.join('')));
+                            }); // end of ajax of document
+ 
+                    // -------------------- start of save ------------------------------------//
+ 
+                    $('#submit').click(function() {
+
+                        var id = $('#id').val();
+                        var custid = $('#custid').val();
+                        var depat = $('#depat').val();
+                          var From = $('#From').val();
+                           var To = $('#To').val();
+                            var passengers = $('#passengers').val();
+                             var insurance = $('#insurance').val();
+                              var refund = $('#refund').val();
+                               var date = $('#date').val();
+                                var amount = $('#amount').val();
+ 
+                    //    alert(id+ " "+name);
+
+                        $.ajax({
+                            type : 'POST',
+                            url : path+"/submit",
+                            contentType : "application/json; charset=utf-8",
+                            data : JSON.stringify({ "id" : id,  "custid" : custid, "depat" : depat,
+                            "From" : From,"To" : To,"passengers" : passengers,"insurance" : insurance,"refund" : refund,"date" : date,
+                            "amount" : amount,})
+                            cache : false,
+                            success : function(result) {
+                                $("#msg").html("<span style='color: green'>Added Successfully</span>");
+                                window.setTimeout(function() {  location.reload() },500);
+                            },
+                            error : function(err) {
+                                $("#msg").html("<span style='color: red'>Unable to Add...</span>");
+                            }
+                        }); // end of ajax of save
+                    }); // end of save
+                    // -------------------- end of save ------------------------------------//
+ 
+                    // -------------------- start of update ------------------------------------//
+                $(document).delegate('#edit','click', 
+                    function() {
+                        $('#submit').hide();
+                        $('#update').show()
+                        var id = $(this).val();
+                        alert("You clicked :: "+id)
+
+                });
+                    // -------------------- end  of update ------------------------------------//
+ 
+                }); // end of document
+    </script>
+</body>
+</html>
